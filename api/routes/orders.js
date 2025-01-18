@@ -1,32 +1,41 @@
-//Importing express and creating a router
+// Importing express and creating a router
 const express = require('express');
 const router = express.Router();
-//Handle requess to fetch all orders and sends a response with status code and a message
-router.get('/',(req, res, next) => {
+
+// Handle request to fetch all orders and send a response with status code and a message
+router.get('/', (req, res, next) => {
     res.status(200).json({
         message: 'Orders were fetched'
     });
 });
-//Handles a request to create a new order and sends a response status and a message
-router.post('/',(req, res, next) => {
+
+// Handle request to create a new order and send a response with status and a message
+router.post('/', (req, res, next) => {
+    const order = {
+        productId: req.body.productId,
+        quantity: req.body.quantity
+    };
     res.status(201).json({
-        message: 'Orders was created'
+        message: 'Orders was created',
+        order: order
     });
 });
-//Handles requests to fetch details of a specific order by its ID based on logic (The req.params.orderId retrieves the value of the orderId from the URL.)
-//and gives response in status and a message
-router.get('/:orderId',(req, res, next) => {
+
+// Handle request to fetch details of a specific order by its ID
+router.get('/:orderId', (req, res, next) => {
     res.status(200).json({
-        message: 'Orders details',
+        message: 'Order details',
         orderId: req.params.orderId
     });
 });
-//Handles request to delete specific order by its ID and gives response in status and a messagecc
-router.delete('/:orderId',(req, res, next) => {
+
+// Handle request to delete a specific order by its ID and send a response with status and a message
+router.delete('/:orderId', (req, res, next) => {
     res.status(200).json({
-        message: 'Orders deleted',
+        message: 'Order deleted',
         orderId: req.params.orderId
     });
 });
-//Exporting the router
-module.exports=router;
+
+// Exporting the router
+module.exports = router;
