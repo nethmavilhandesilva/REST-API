@@ -9,6 +9,7 @@ const app = express();
 // Importing Routes
 const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
+const userRoutes = require('./api/routes/user');
 
 // Connect to MongoDB Atlas
 mongoose.connect(
@@ -40,6 +41,7 @@ app.use((req, res, next) => {
 // Routes to Handle Requests
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
+app.use("/user",userRoutes);
 
 // Error Handling
 app.use((req, res, next) => {
