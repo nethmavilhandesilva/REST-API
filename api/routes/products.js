@@ -1,16 +1,57 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const multer = require('multer');//Handles file uploads (images)
+const checkAuth = require('../middleware/check-auth'); 
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './uploads/'); 
+    },
+    filename: function (req, file, cb) {
+        
+        const sanitizedFilename = new Date().toISOString().replace(/:/g, '-') + file.originalname;
+        cb(null, sanitizedFilename);
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    // Accept only JPEG and PNG files
+    if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+        cb(null, true); // Accept the file
+    } else {
+        cb(null, false); // Reject the file
+    }
+};
+
+// Multer configuration
+const upload = multer({
+    storage: storage,
+    limits:{
+        filesize: 1024*1024*5
+    },
+    fileFilter: fileFilter
+});
+
+
+// Ensure the uploads directory exists (use this only once during initialization)
+const fs = require('fs');
+const uploadsDir = './uploads/';
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir);
+}
 
 // Importing the Product model
 const Product = require('../models/product');
 
-// Middleware to parse JSON (should already be applied in your main app file)
+// Middleware to parse JSON (use express.json in your main app file)
 router.use(express.json());
 
 // Handling GET request for all products
-router.get('/', (req, res) => {
+router.get('/', (req, res,next) => {
     Product.find()
+        .select("name price _id productImage")
         .exec()
         .then(docs => {
             console.log("From Database:", docs);
@@ -23,7 +64,10 @@ router.get('/', (req, res) => {
 });
 
 // Handling POST request to create a product
-router.post('/', (req, res) => {
+router.post('/', upload.single('productImage'),checkAuth, (req, res) => {
+    console.log('File uploaded:', req.file); // Debugging: Log the uploaded file details
+    console.log('Request body:', req.body); // Debugging: Log the request body
+
     const { name, price } = req.body;
 
     // Validate input
@@ -39,7 +83,8 @@ router.post('/', (req, res) => {
     const product = new Product({
         _id: new mongoose.Types.ObjectId(),
         name: name.trim(),
-        price: parsedPrice
+        price: parsedPrice,
+        productImage: req.file.path // Save the file path if an image is uploaded
     });
 
     product.save()

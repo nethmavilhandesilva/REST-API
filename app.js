@@ -1,14 +1,16 @@
 const express = require('express');
 const morgan = require('morgan');
-const bodyParser = require('body-parser');
+const bodyParser = require('body-parser');//Parses incoming request bodies into JSON or URL-encoded format
 const mongoose = require('mongoose');
-require('dotenv').config(); // Load environment variables
+require('dotenv').config(); //Loads environment variables from a .env file (e.g., database credentials).
+
 
 const app = express();
 
 // Importing Routes
 const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
+const userRoutes = require('./api/routes/user');
 
 // Connect to MongoDB Atlas
 mongoose.connect(
@@ -40,14 +42,16 @@ app.use((req, res, next) => {
 // Routes to Handle Requests
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
+app.use('/user', userRoutes);  // Ensure this matches with your user routes file
 
-// Error Handling
+// Error Handling - 404 Not Found
 app.use((req, res, next) => {
     const error = new Error('Not Found');
     error.status = 404;
     next(error);
 });
 
+// General Error Handler
 app.use((error, req, res, next) => {
     res.status(error.status || 500);
     res.json({
