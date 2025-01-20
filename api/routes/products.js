@@ -1,15 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
-const multer = require('multer');
+const multer = require('multer');//Handles file uploads (images)
+const checkAuth = require('../middleware/check-auth'); 
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, './uploads/'); // Ensure this folder exists in the project root
+        cb(null, './uploads/'); 
     },
     filename: function (req, file, cb) {
-        // Replace invalid characters in the filename (e.g., colons on Windows)
+        
         const sanitizedFilename = new Date().toISOString().replace(/:/g, '-') + file.originalname;
         cb(null, sanitizedFilename);
     }
@@ -63,7 +64,7 @@ router.get('/', (req, res,next) => {
 });
 
 // Handling POST request to create a product
-router.post('/', upload.single('productImage'), (req, res) => {
+router.post('/', upload.single('productImage'),checkAuth, (req, res) => {
     console.log('File uploaded:', req.file); // Debugging: Log the uploaded file details
     console.log('Request body:', req.body); // Debugging: Log the request body
 

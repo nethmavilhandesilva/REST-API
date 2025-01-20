@@ -1,4 +1,6 @@
-const mongoose = require('mongoose');
+//This code defines a Mongoose schema and model for an Order in a MongoDB database. Here's a detailed explanation:
+
+const mongoose = require('mongoose');//Import mongoosa
 
 // Define the order schema (not product)
 const orderSchema = mongoose.Schema({
